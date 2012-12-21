@@ -1,8 +1,8 @@
 <?php
 
 	header('Content-Type: application/json');
-	
-	sleep(3);
+
+	//sleep(3);
 
 	require_once('jsonobject.php');
 
