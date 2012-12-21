@@ -226,21 +226,25 @@
 	  or just set it. Also they should stretch fine to whatever height you give .meter. </p>
 
 	  <div class="meter storybot-light-orange nostripes">
-			<span class="pulsate" style="width: 25%"></span>
+			<span class="pulsate" style="width: 3%"></span>
 		</div>
 		<div><div id="progress-number">3</div>%</div>
 
 
 		<pre><code>// this is for storybot progress bar
 &lt;div class=&quot;meter storybot-light-orange nostripes&quot;&gt;
-	&lt;span style=&quot;width: 25%&quot;&gt;&lt;/span&gt;
+	&lt;span style=&quot;width: 3%&quot;&gt;&lt;/span&gt;
 &lt;/div&gt;</code></pre>
+
+		<div id="execute">Run the progress bar</div>
 
 	</div>
 
 	<script>
 	$(document).ready(function() {
-
+		$("#execute").click(function(e){
+			executeProcess();
+		});
 	});
 
 
