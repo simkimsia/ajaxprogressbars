@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset='UTF-8'>
+	
+	<title>Ajax Progress Bars Upload Files</title>
+	
+	<link rel='stylesheet' href='css/style.css'>
+	
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+	
+	<style>
+		.meter { 
+			height: 15px;  /* Can be anything */
+			position: relative;
+			margin: 60px 0 20px 0; /* Just for demo spacing */
+			background: #555;
+			-moz-border-radius: 25px;
+			-webkit-border-radius: 25px;
+			border-radius: 25px;
+			padding: 0px; /* padding within the meter */
+			-webkit-box-shadow: inset 0 -1px 1px rgba(255,255,255,0.3);
+			-moz-box-shadow   : inset 0 -1px 1px rgba(255,255,255,0.3);
+			box-shadow        : inset 0 -1px 1px rgba(255,255,255,0.3);
+		}
+		.meter > span {
+			display: block;
+			height: 100%;
+			   -webkit-border-top-right-radius: 20px;
+			-webkit-border-bottom-right-radius: 20px;
+			       -moz-border-radius-topright: 20px;
+			    -moz-border-radius-bottomright: 20px;
+			           border-top-right-radius: 20px;
+			        border-bottom-right-radius: 20px;
+			    -webkit-border-top-left-radius: 20px;
+			 -webkit-border-bottom-left-radius: 20px;
+			        -moz-border-radius-topleft: 20px;
+			     -moz-border-radius-bottomleft: 20px;
+			            border-top-left-radius: 20px;
+			         border-bottom-left-radius: 20px;
+			background-color: rgb(43,194,83);
+			background-image: -webkit-gradient(
+			  linear,
+			  left bottom,
+			  left top,
+			  color-stop(0, rgb(43,194,83)),
+			  color-stop(1, rgb(84,240,84))
+			 );
+			background-image: -moz-linear-gradient(
+			  center bottom,
+			  rgb(43,194,83) 37%,
+			  rgb(84,240,84) 69%
+			 );
+			/*
+			-webkit-box-shadow: 
+			  inset 0 2px 9px  rgba(255,255,255,0.3),
+			  inset 0 -2px 6px rgba(0,0,0,0.4);
+			-moz-box-shadow: 
+			  inset 0 2px 9px  rgba(255,255,255,0.3),
+			  inset 0 -2px 6px rgba(0,0,0,0.4);
+			box-shadow: 
+			  inset 0 2px 9px  rgba(255,255,255,0.3),
+			  inset 0 -2px 6px rgba(0,0,0,0.4);
+			  */
+			position: relative;
+			overflow: hidden;
+		
+		}
+		.meter > span:after, .animate > span > span {
+			content: "";
+			position: absolute;
+			top: 0; left: 0; bottom: 0; right: 0;
+			background-image: 
+			   -webkit-gradient(linear, 0 0, 100% 100%, 
+			      color-stop(.25, rgba(255, 255, 255, .2)), 
+			      color-stop(.25, transparent), color-stop(.5, transparent), 
+			      color-stop(.5, rgba(255, 255, 255, .2)), 
+			      color-stop(.75, rgba(255, 255, 255, .2)), 
+			      color-stop(.75, transparent), to(transparent)
+			   );
+			background-image: 
+				-moz-linear-gradient(
+				  -45deg, 
+			      rgba(255, 255, 255, .2) 25%, 
+			      transparent 25%, 
+			      transparent 50%, 
+			      rgba(255, 255, 255, .2) 50%, 
+			      rgba(255, 255, 255, .2) 75%, 
+			      transparent 75%, 
+			      transparent
+			   );
+			z-index: 1;
+			-webkit-background-size: 50px 50px;
+			-moz-background-size: 50px 50px;
+			-webkit-animation: move 2s linear infinite;
+			   -webkit-border-top-right-radius: 8px;
+			-webkit-border-bottom-right-radius: 8px;
+			       -moz-border-radius-topright: 8px;
+			    -moz-border-radius-bottomright: 8px;
+			           border-top-right-radius: 8px;
+			        border-bottom-right-radius: 8px;
+			    -webkit-border-top-left-radius: 20px;
+			 -webkit-border-bottom-left-radius: 20px;
+			        -moz-border-radius-topleft: 20px;
+			     -moz-border-radius-bottomleft: 20px;
+			            border-top-left-radius: 20px;
+			         border-bottom-left-radius: 20px;
+			overflow: hidden;
+		}
+		
+		.animate > span:after {
+			display: none;
+		}
+		
+		@-webkit-keyframes move {
+		    0% {
+		       background-position: 0 0;
+		    }
+		    100% {
+		       background-position: 50px 50px;
+		    }
+		}
+
+		.storybot-light-orange > span {
+			background-color: #fcd45e;
+			background-image: -moz-linear-gradient(top, #fcd45e, #FDB515);
+			background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #fcd45e),color-stop(1, #FDB515));
+			background-image: -webkit-linear-gradient(#fcd45e, #FDB515); 
+			
+			border:2px solid #FFE681;
+ 			-moz-box-sizing:border-box;
+ 			-webkit-box-sizing:border-box;
+ 			box-sizing:border-box; 			
+		}
+		
+		.nostripes > span > span, .nostripes > span:after {
+			-webkit-animation: none;
+			background-image: none;
+		}
+
+		.transition {
+		-webkit-transition: all 1s ease-in-out;
+		-moz-transition: all 1s ease-in-out;
+		-o-transition: all 1s ease-in-out;
+		transition: all 1s ease-in-out;
+		}
+
+		 .pulsate {
+		  -webkit-animation-name: glow;
+		  -webkit-animation-duration: 1s;
+		  -webkit-animation-iteration-count: infinite;
+		  -webkit-animation-direction: alternate;
+		  -webkit-animation-timing-function: ease-in-out;
+
+		  -moz-animation-name: glow;
+		  -moz-animation-duration: 1s;
+		  -moz-animation-iteration-count: infinite;
+		  -moz-animation-direction: alternate;
+		  -moz-animation-timing-function: ease-in-out;
+
+		  -o-animation-name: glow;
+		  -o-animation-duration: 1s;
+		  -o-animation-iteration-count: infinite;
+		  -o-animation-direction: alternate;
+		  -o-animation-timing-function: ease-in-out;
+
+		  animation-name: glow;
+		  animation-duration: 1s;
+		  animation-iteration-count: infinite;
+		  animation-direction: alternate;
+		  animation-timing-function: ease-in-out;
+
+		}
+
+		@-webkit-keyframes glow {
+		  0% {
+		    -webkit-box-shadow: 0 0 16px rgba(255, 230, 129, 0.5);
+		    border-color: rgba(255,230,129,0.5);
+		  }
+		  100% {
+		    -webkit-box-shadow: 0 0 20px rgba(255, 230, 129, 1.0);
+		    border-color: rgba(255,230,129,1.0);
+		  }
+		}
+		@-moz-keyframes glow {
+		  0% {
+		    -moz-box-shadow: 0 0 16px rgba(255, 230, 129, 0.5);
+		    border-color: rgba(255,230,129,0.5);
+		  }
+		  100% {
+		    -moz-box-shadow: 0 0 20px rgba(255, 230, 129, 1.0);
+		    border-color: rgba(255,230,129,1.0);
+		  }
+		}
+		@-o-keyframes glow {
+		  0% {
+		    box-shadow: 0 0 16px rgba(255, 230, 129, 0.5);
+		    border-color: rgba(255,230,129,0.5);
+		  }
+		  100% {
+		    box-shadow: 0 0 20px rgba(255, 230, 129, 1.0);
+		    border-color: rgba(255,230,129,1.0);
+		  }
+		}
+		@keyframes glow {
+		  0% {
+		    box-shadow: 0 0 16px rgba(255, 230, 129, 0.5);
+		    border-color: rgba(255,230,129,0.5);
+		  }
+		  100% {
+		    box-shadow: 0 0 20px rgba(255, 230, 129, 1.0);
+		    border-color: rgba(255,230,129,1.0);
+		  }
+		}
+	</style>
+</head>
+
+<body>
+
+	<div id="page-wrap">
+		
+	  <h1>Progress Bars</h1>
+	  
+	  <p>They should stretch fine to whatever the width of the container element is, 
+	  or just set it. Also they should stretch fine to whatever height you give .meter. </p>
+
+	  <div class="meter storybot-light-orange nostripes">
+			<span class="pulsate" style="width: 25%"></span>
+		</div>
+		<div><div id="progress-number">3</div>%</div>
+
+
+		<pre><code>// this is for storybot progress bar
+&lt;div class=&quot;meter storybot-light-orange nostripes&quot;&gt;
+	&lt;span style=&quot;width: 25%&quot;&gt;&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+
+	</div>
+
+	<script>
+	$(document).ready(function() {
+
+	});
+
+
+	function executeStep1() {
+		
+		var url = "/ajax/step1.php";
+		var type = "POST";
+		var data = {};
+
+		//start the ajax
+		return $.ajax({
+			//this is the php file that processes the data and send mail
+			url: url,	
+			
+			//GET method is used
+			type: type,
+
+			//pass the data			
+			data: data,		
+			
+			//Do not cache the page
+			cache: false,
+			
+			//success
+			success: function (json) {				
+				console.log(json);
+
+				//if POST is a success expect no errors
+				if (json.error == null && json.result != null) {			
+
+					data = json.result.data;
+					
+				// error 
+				} else {
+					alert(json.error);	
+				}			
+			}		
+		});
+	}
+
+	function uploadFiles(stepX) {
+		var files = null;
+		var url = "/ajax/uploadfiles.php";
+		var type = "POST";
+
+		if (stepX == "2") {
+			files = ["file1", "file2"]; // using string to simulate actual file upload
+		} else {
+			files = ["file1", "file2", "file3"]; // using string to simulate actual file upload
+		}
+
+		if (files.length > 0) {
+			
+			var data = new FormData();
+			var postData = {};
+
+			for (var i=0; i<files.length; i++) {
+				var file = files.getByIndex(i);
+
+				data.append(i, file); 	
+				
+				console.log(data);
+			}
+
+			//start the ajax
+			return $.ajax({
+				//this is the php file that processes the data and send mail
+				url: url,	
+				
+				//POST method is used
+				type: type,
+
+				//pass the data			
+				data: data,		
+				
+				//Do not cache the page
+				cache: false,
+
+				// DO NOT set the contentType and processData
+				// see http://stackoverflow.com/a/5976031/80353
+				contentType: false,
+	    		processData: false,
+				
+				//success
+				success: function (json) {				
+					
+					//if POST is a success expect no errors
+					if (json.error == null && json.result != null) {					
+						data = json.result.data;
+						
+					// error 
+					} else {
+						alert(json.error);	
+					}			
+				}		
+			});
+		} 
+		return {'error' : 'No files', 'result' : null};
+	}
+
+	function executeStep2() {
+		uploadFiles('2');
+	}
+
+	function executeStep3() {
+		uploadFiles('3');
+	}
+
+	function executeStep4() {
+		var data = {};
+
+		//start the ajax
+		return $.ajax({
+			//this is the php file that processes the data and send mail
+			url: "/ajax/step4.php",
+			
+			//POST method is used
+			type: "POST",
+
+			//pass the data			
+			data: data,		
+			
+			//Do not cache the page
+			cache: false,
+			
+			//success
+			success: function (json) {				
+				
+				//if POST is a success expect no errors
+				if (json.error == null && json.result != null) {					
+					data = json.result.data;
+					
+				// error 
+				} else {
+					alert(json.error);	
+				}			
+			}		
+		});
+	}
+
+	function executeStep5(id) {
+		var data = {};
+
+		$.ajax({
+			//this is the php file that processes the data and send mail
+			url: "/ajax/step5.json",
+			
+			//POST method is used
+			type: "PUT",
+			
+			//Do not cache the page
+			cache: false,
+			
+			//success
+			success: function (json) {				
+				
+				//if POST is a success expect no errors
+				if (json.error == null && json.result != null) {					
+					data = json.result.data;
+					// similar behavior as an HTTP redirect
+					window.location.replace("/success.html");
+				// error 
+				} else {
+					showError(json.error);	
+				}			
+			}		
+		});
+	}
+
+	function showError(message) {
+
+	}
+
+	function objectHasNestedProperty(obj, prop) {
+		// there is actual logic here. but i just made sure it returns true regardless
+	    return true;
+	}
+
+	function ajaxResultIsSuccessful(ajaxResult) {
+		// there is actual logic here. but i just made sure it returns true regardless
+    	return true;
+	}
+
+
+	function executeProcess() {
+		var promisesArray = new Array();
+		var step1Promise = executeStep1();
+		animateProgressBar();
+
+		$.when(step1Promise).done(function (ajaxResult){
+			increaseProgressBar(22);
+
+			var ajaxResultSuccessful = ajaxResultIsSuccessful(ajaxResult);
+			if (ajaxResultSuccessful) {
+
+				var step2Promise = executeStep2();
+				var step3Promise = executeStep3();
+				
+				$.when(step2Promise).done(function (ajaxResult2) {
+
+					increaseProgressBar(25);
+
+					ajaxResultSuccessful = ajaxResultIsSuccessful(ajaxResult2);
+					if (ajaxResultIsSuccessful) {
+
+						increaseProgressBar(25);
+
+						var step4Promise = executeStep4();	
+
+						increaseProgressBar(5);
+
+						$.when(step4Promise).done(function (ajaxResult4){
+							ajaxResultSuccessful = ajaxResultIsSuccessful(ajaxResult4);
+							var validId = false;
+							var id = 0;
+							if (ajaxResultSuccessful) {
+								validId = objectHasNestedProperty(ajaxResult4, "result.id");
+								increaseProgressBar(20);
+								//id = ajaxResult4.result.id;
+							}
+							
+							if (validId) {
+
+								executeStep5(id);
+									
+							}// end if validStoryId
+						});// when executeStep4 done
+					}// if executeStep2 successful
+				});// when executeStep2 done
+			} // executeStep1 successful
+		});// when executeStep1 done
+	}
+
+	function increaseProgressBar(incrementByPercent) {
+		var hundredPercentWidth = $(".meter").width();
+		var currentPercentWidth = parseInt($("#progress-number").html());
+		var currentWidth = $(".meter > span").width();
+		
+		var newPercentWidth = currentPercentWidth + incrementByPercent;
+		var newWidth = (newPercentWidth / 100) * hundredPercentWidth;
+		if (newWidth > hundredPercentWidth) {
+			newWidth = hundredPercentWidth;
+			newPercentWidth = 100;
+		}
+		$(".meter > span").width(newWidth);
+		animateProgressBar(currentWidth);
+		$("#progress-number").html(newPercentWidth);
+	}
+
+	function animateProgressBar(originalWidth) {
+		if (typeof originalWidth == 'undefined') {
+			originalWidth = 0;
+		}
+		$(".meter > span").each(function() {
+			$(this)
+				.data("origWidth", $(this).width())
+				.width(originalWidth)
+				.animate({
+					width: $(this).data("origWidth")
+				}, 1200);
+		});
+	}
+	
+	</script>
+	
+</body>
+
+</html>
