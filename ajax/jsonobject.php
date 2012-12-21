@@ -3,8 +3,8 @@
 
 class JsonObject {
 
-	var result = null;
-	var error = null;
+	public $result = null;
+	public $error = null;
 
 	function __construct($success = true) {
        if ($success) {
